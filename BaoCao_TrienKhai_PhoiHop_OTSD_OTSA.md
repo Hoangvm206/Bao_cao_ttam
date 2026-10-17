@@ -1,5 +1,5 @@
 # BÁO CÁO KẾT QUẢ TRIỂN KHAI & PHỐI HỢP KỸ THUẬT OTSD ↔ OTSA
-## THIẾT LẬP KÊNH TRUYỀN DỮ LIỆU AN TOÀN & ĐIỀU PHỐI BẢN PHÁT HÀNH QUA HTTPS mTLS (TASK 12)
+## THIẾT LẬP KÊNH TRUYỀN DỮ LIỆU AN TOÀN & ĐIỀU PHỐI BẢN PHÁT HÀNH QUA HTTPS mTLS
 
 | Thông tin | Chi tiết |
 |---|---|
