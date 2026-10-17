@@ -263,7 +263,6 @@ Nhóm OTSA đã hoàn tất triển khai và kiểm chứng thực nghiệm 100%
 | **Kiểm tra chữ ký số nhập kho** | OTSD | **Hoàn thành 100%** | Xác thực `SHA256SUMS.sig` PASS, nhận symlink. |
 | **Thống nhất kiến trúc điều phối Mục 4** | Hai bên | **Hoàn thành 100%** | Đã chốt 5 điểm kiến trúc, có endpoint cố định. |
 | **Chuẩn hóa cấu hình Wazuh Agent (Mục 5)** | OTSA + OTSD | **Sẵn sàng** | Phía OTSA đã sẵn sàng; chờ mở cổng quản trị trên máy chủ `.25`. |
-| **Bảo toàn sản phẩm F8/F9 & Dọn sạch core** | OTSA | **Hoàn thành 100%** | Đã tách nhánh sạch `feat/otsa-dev`, lưu an toàn 15 file. |
 | **Cơ chế an toàn nâng cấp ZFS BE (`bectl`)** | OTSA | **Hoàn thành 100%** | Đo kiểm CoW tức thời (8K metadata), sẵn sàng kịch bản Rollback 2 cấp. |
 | **V1: Chuẩn hóa lưu trữ chứng chỉ thiết bị** | OTSA | **Hoàn thành 100%** | Phân quyền an toàn `0600`/`0644` tại `/usr/local/etc/otsa/`. |
 | **V2: Kẹp mTLS vào Core (downloader/uri)** | OTSA | **Hoàn thành 100%** | Đã patch và biên dịch kiểm tra cú pháp Python PASS. |
