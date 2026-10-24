@@ -1,0 +1,41 @@
+{
+  "status": "PASS_SCOPED_GUI_API_AND_MARKER_ROLLBACK",
+  "checked_at_utc": "2026-10-23T15:06:58.5669522Z",
+  "machine": "dev 192.168.56.56",
+  "device36_accessed": false,
+  "product_code_changed": false,
+  "package_built_or_installed": false,
+  "real_reboots": 2,
+  "checks": {
+    "SingleRollbackMenu": true,
+    "CreateCountIncreasedByOne": true,
+    "BootedTestBE": true,
+    "RestoredBeforeHash": true,
+    "ReturnedDefault": true,
+    "RetainedAfterHash": true,
+    "ActualGuiActivate": true,
+    "FinalDefaultNR": true,
+    "TestBEInactive": true,
+    "FourGETMutationsRejected": true,
+    "MissingCsrf403": true,
+    "DuplicateAndInvalidNameRejected": true,
+    "GuardBECountUnchanged": true,
+    "OriginalBEIdsRetained": true,
+    "InventoryUnchanged": true,
+    "ConfigIdentityAndSourceHashesUnchanged": true,
+    "EffectivePfUnchanged": true,
+    "CronUnchanged": true,
+    "MarkerRemoved": true,
+    "BrowserProfilesRemoved": true
+  },
+  "failed_checks": [],
+  "rules_debug_byte_hash_changed": true,
+  "limits": [
+    "root account only; restricted-user ACL E2E not tested",
+    "marker rollback, not package/base/kernel upgrade rollback",
+    "one-time boot selection via SSH, not added GUI capability",
+    "clone/rename/delete and non-ZFS runtime not tested",
+    "browser logout confirmation false; owned incognito browser/profile removed"
+  ],
+  "retained_test_be": "otsa-rollback-demo-20261023"
+}
