@@ -26,7 +26,7 @@ Suricata đã nhận/nạp/thu hồi thật từ .25 và ACK. **Chưa nghiệm t
 ## 3. Việc thầy giao — thứ Năm
 
 - **Mặc định 30 phút, người dùng được chỉnh:** chờ anh Dương trao đổi lại.
-- **Truyền CSV firewall:** Dương xác nhận v2 dùng **rules.json theo danh mục firewall/pf**, không truyền CSV cũ. OTSA đã có chức năng nhận/kiểm/lưu JSON, apply/thu hồi/rollback; chưa kiểm bộ PF thật được giao từ .25. Chưa có bằng chứng lưu nguyên CSV cũ trên thiết bị.
+- **Truyền CSV firewall:** Dương xác nhận v2 dùng **rules.json theo danh mục firewall/pf**, không truyền CSV cũ. OTSA đã có chức năng nhận/kiểm/lưu JSON, apply/thu hồi/rollback; chưa kiểm bộ PF thật được giao từ .25.
 - **Sửa theo báo cáo thầy và yêu cầu Dương ngày 05/11:** tiến độ các đợt như sau.
 
 | Đợt | Nội dung | Đã hoàn thành đến đâu | Chưa làm / chưa nghiệm thu |
