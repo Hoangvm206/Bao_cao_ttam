@@ -102,8 +102,4 @@ khác giữ sửa local của chính luật OTSD. Planner có thể điều ch�
 luật ngoài OTSD để sắp thứ tự, nên không hứa mọi trường/priority luôn bất biến.
 
 
-Chức năng tự ghi/Apply có trong nguồn; .56 bật rules consumer ở lần đọc07/11.
-Chưa nghiệm thu PF assignment thật .25→.56 trong đợt này và chưa triển khai
-cơ chế giữ sửa local nói trên. Không lấy blacklist có sẵn trên ảnh để chứng
-minh PF JSON category đã được server giao/ACK. Không tạo rule nguy hiểm hoặc
-report failed giả để kiểm. Tiến độ chung xem [báo cáo xuyên suốt](BAO_CAO_TIEN_DO_OTSA.md).
+
