@@ -1,17 +1,12 @@
 # Báo cáo tiến độ OTSA — 06/11/2026
 
-**Kết nối cuối lượt07/11:** sau ACK thật/idle125s đạt, TCP .56→.25:8443
-timeout trở lại; v2 giữ last_error=state_timeout, outbox0, không gửi failed
-cho lỗi mạng. Hoàng đang kiểm VPN; chưa xác nhận health mạng cuối hồi phục.
-
-Cập nhật **07/11**: mục1–3 đã sửa và lên .56, kiểm cách ly/native phù hợp đạt. [Bằng chứng mục1–3 ngày07/11](C:/work/opnsense/OTSA_BAN_GIAO/BANG_CHUNG_N07_MUC_1_2_3_20261107.md). Còn các ca phối hợp cert/PF reboot và nghiệm thu đầu-cuối.
 
 ## 1. Việc thầy giao — đợt 1
 
 - **GUI Upgrade:** hoàn thành, đã kiểm giao diện.
 - **Gộp OTSD Connection và Log Forwarding Agent:** hoàn thành.
-- **Đổi cổng Connection:** giữ 8443 theo Dương; long-polling tải nhẹ. Máy trùng cổng thì đổi riêng ở OTSD (DEVICE_PORT) và ô Port phía OTSA.
-- **Dùng chung cert OTSD cho Wazuh 1515:** có thể làm nhưng chưa triển khai. Máy mới cần khóa Wazuh để xin cert OTSD; phải chốt bootstrap và cấu hình authd để tránh phụ thuộc vòng.
+- **Đổi cổng Connection:** giữ 8443 theo a Dương, long-polling tải rất nhẹ (mỗi thiết bị 1 kết nối chờ, khoảng 1 phút 1 phản hồi rỗng; dữ liệu chỉ chạy khi có phát hành), đổi cổng cũng không nhanh hơn. Máy nào trùng cổng thì đổi riêng: OTSD đặt DEVICE_PORT, OTSA sửa ô Port
+- **Dùng chung cert OTSD cho Wazuh 1515:** Wazuh làm được, nhưng hiện thiết bị xin chứng chỉ OTSD bằng khoá agent Wazuh, nên phải đăng ký Wazuh trước. Nếu đăng ký Wazuh lại cần chứng chỉ OTSD thì máy mới bị kẹt vòng, chưa kể phải sửa cấu hình authd của manager.
 
 ## 2. Việc anh Dương — kênh mTLS v2
 
@@ -45,7 +40,7 @@ Suricata đã nhận/nạp/thu hồi thật từ .25 và ACK. **Chưa nghiệm t
 
 Các đợt P0/P1/P2/P3/F chưa commit/push. Kết quả lab không thay nghiệm thu production hoặc xác nhận của thầy/anh Dương.
 
-## 4. Bổ sung Dương ngày 07/11 — trạng thái sau sửa mục1–3
+## 4. Bổ sung a Dương ngày 07/11 — trạng thái sau sửa mục1–3
 
 | Mục mới | Cần làm / trạng thái |
 |---|---|
@@ -57,10 +52,6 @@ Các đợt P0/P1/P2/P3/F chưa commit/push. Kết quả lab không thay nghiệ
 | N07-6 | PF pending cùng payload giữ lý do probe, không reset deadline. Chưa sửa. |
 | N07-7 | Activity hiển thị mã/lý do đã lọc bí mật thay vì chỉ Failed. Chưa sửa. |
 
-Dương đã kiểm PF 1.0.1 applied/ACK trên **.35**; đây là bằng chứng của Dương, chưa thay nghiệm thu .56. OTSD .25 theo tin nhắn vẫn 0.3.1; 0.3.2 lưu errors và tự đóng tracking bản chưa applied, chưa xác nhận đã chạy .25. Luật/model nhận bản thấp hơn đã đạt **cách ly**, chưa assignment thật .25.
-
-Chi tiết và nguồn: [Phản hồi Dương 07/11](C:/work/opnsense/OTSA_BAN_GIAO/CAP_NHAT_PHAN_HOI_DUONG_20261107.md).
-
 
 ## 5. Thứ tự làm nốt đã gộp 07/11
 
@@ -69,12 +60,8 @@ Chi tiết và nguồn: [Phản hồi Dương 07/11](C:/work/opnsense/OTSA_BAN_G
 3. **Đã sửa/lên .56:** Connection/TLS cũ, inventory/Mock files; probe thật đạt.
 4. **Việc sửa tiếp theo:** PF/blacklist: empty no-op, giữ lỗi gốc, pending/deadline, retention.
 5. Activity: hiện mã/chi tiết lỗi đã lọc; từng gói đạt thì backup/triển khai .56.
-6. Phối hợp Dương: kiểm cert/rename/pending/blocked active ổn trước, rồi PF reboot.
+6. Phối hợp a Dương: kiểm cert/rename/pending/blocked active ổn trước, rồi PF reboot.
 7. Kiểm assignment thật còn thiếu: PF, mixed state, IPv6, luật/model bản thấp hơn.
 8. Khóa/bundle chính thức và cài bản cao hơn khi có đủ điều kiện/cho phép.
 
-P3 cutover active, Wazuh1515 và các việc thầy còn phụ thuộc được theo dõi riêng;
-không chặn sửa lỗi trước. Chi tiết điều kiện và phạm vi tại
-[thứ tự làm nốt, mục8](C:/work/opnsense/OTSA_BAN_GIAO/TONG_HOP_VIEC_CAN_LAM_20261105.md).
 
-Đã phục hồi lỗi SQLite hot journal có sẵn trước overlay, giữ queue; bổ sung guard startup. Hồi quy105ca đạt, tập trung cuối51ca đạt; idle125s không POST lặp. Backup chung khoảng100KiB, chỉ restart v2, không đổi cert/gates/reboot.
