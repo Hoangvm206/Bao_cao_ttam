@@ -1,4 +1,4 @@
-# Báo cáo tiến độ OTSA — 06/11/2026
+# Báo cáo tiến độ OTSA — 07/11/2026
 
 
 ## 1. Việc thầy giao — đợt 1
