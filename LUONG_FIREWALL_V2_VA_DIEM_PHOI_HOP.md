@@ -101,12 +101,6 @@ U=otsa-update; P=otsa-policy. Không sửa nhầm bản legacy hoặc worktree k
 khác giữ sửa local của chính luật OTSD. Planner có thể điều chỉnh sequence
 luật ngoài OTSD để sắp thứ tự, nên không hứa mọi trường/priority luôn bất biến.
 
-## 5. Kiểm chung tối thiểu và trạng thái
-
-- Giao A lần đầu: tự nhận → hiện bảng → có hiệu lực → report đúng.
-- Sửa local A rồi giao lại A cũ: giữ phần đã sửa theo yêu cầu thầy.
-- Kiểm giao bản mới, đổi thứ tự và thu hồi sau khi chốt chính sách ở mục3.
-- Giữ luật mặc định/luật người dùng ngoài phạm vi; lỗi không để apply dở dang.
 
 Chức năng tự ghi/Apply có trong nguồn; .56 bật rules consumer ở lần đọc07/11.
 Chưa nghiệm thu PF assignment thật .25→.56 trong đợt này và chưa triển khai
