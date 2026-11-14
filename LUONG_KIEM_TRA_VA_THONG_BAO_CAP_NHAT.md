@@ -211,26 +211,26 @@ Các lựa chọn thiết kế không mở rộng quyền cài đặt; chúng ch
 
 ## 9. Ca kiểm thử nghiệm thu
 
-| Ca | Kết quả cần thấy |
-| --- | --- |
-| OTSD giao bản mới khi người dùng ở trang GUI khác | Nhận qua v2, hiện toast, không chờ đủ 30 phút |
-| Bấm Check khi có bản mới | Có yêu cầu kiểm trực tiếp OTSD, thông tin bản giao hiện trên GUI |
-| Bấm Check khi không có bản mới | Phản hồi "không có bản mới" kèm thời điểm kiểm tra |
-| Đến lịch mặc định hoặc chu kỳ đã chỉnh | Backend tự kiểm dù không mở Updates; dùng chu kỳ đã lưu |
-| Đổi chu kỳ | Có hiệu lực từ lần hẹn kế tiếp; giá trị ngoài giới hạn bị từ chối ở server |
-| Chọn Để sau với bản `confirm` | Không xác nhận cài; assignment vẫn chờ; banner còn |
-| Mở trang Updates rồi thoát mà không xác nhận | Banner vẫn còn; không coi là đồng ý cài |
-| Long-poll trả lại cùng bản nhiều lần | Không phát sinh toast trùng |
-| Đã xác nhận hoặc đã cài | Không nhắc như bản chưa xác nhận; trạng thái tiến trình vẫn đúng |
-| OTSD thu hồi hoặc thay bản đang chờ | Gỡ thông báo cũ, hiện đúng trạng thái/bản mới |
-| Bản `auto` | Tuân thủ chính sách hiện có; đóng thông báo không đổi quyền hoặc lịch cài |
-| OTSD mất kết nối hoặc trả lỗi | Báo kiểm tra thất bại, giữ và đánh dấu dữ liệu gần nhất; không báo "không có cập nhật" |
-| GET chủ động và long-poll hoàn tất đồng thời | Không lùi state, không cài/report hai lần, không nhân đôi thông báo |
-| OTSD chỉ đổi assignment firewall/Suricata | Không thông báo nhầm có cập nhật phần mềm mới |
-| Nhiều tab/phiên cùng mở | Không nhân đôi thông báo; một người xử lý thì các phiên khác cùng cập nhật |
-| Đóng trình duyệt, bản mới đến, mở lại GUI | Thông báo (`unseen`) hiện khi mở lại |
-| Dịch vụ khởi động lại khi đang có bản chờ | Trạng thái thông báo và mốc kiểm tra được giữ |
-| Phản hồi request cũ về sau khi request mới đã được nhận | Bị bỏ qua theo thứ tự request, không lùi state; không suy thứ tự từ chuỗi revision |
+| Ca | Kết quả cần thấy | Trạng thái kiểm thử / phần còn chờ |
+| --- | --- | --- |
+| OTSD giao bản mới khi người dùng ở trang GUI khác | Nhận qua v2, hiện toast, không chờ đủ 30 phút | Đạt tự động phần lưu thông báo và toast ở Status. Chờ giao bản thật khi đang ở một trang GUI khác ngoài Software Update. |
+| Bấm Check khi có bản mới | Có yêu cầu kiểm trực tiếp OTSD, thông tin bản giao hiện trên GUI | Đạt tự động phần GET tức thời qua Engine và toast bản chờ. Chờ GET tới OTSD thật và hiển thị bản giao mới. |
+| Bấm Check khi không có bản mới | Phản hồi "không có bản mới" kèm thời điểm kiểm tra | Đạt tự động phản hồi không có bản mới; backend có kiểm mốc thành công. Chờ đối chiếu thông điệp và thời điểm sau GET thật. |
+| Đến lịch mặc định hoặc chu kỳ đã chỉnh | Backend tự kiểm dù không mở Updates; dùng chu kỳ đã lưu | Đạt tự động lịch mặc định, đổi chu kỳ và kiểm bù; .56 đã trả mặc định 30 phút. Chờ quan sát GET theo lịch thật khi đóng GUI. |
+| Đổi chu kỳ | Có hiệu lực từ lần hẹn kế tiếp; giá trị ngoài giới hạn bị từ chối ở server | Đạt tự động đổi lịch/lưu GUI; model thật chấp nhận 5/1440, từ chối 4/1441/5.5. Chờ thao tác GUI đăng nhập và quan sát lần kiểm theo chu kỳ mới. |
+| Chọn Để sau với bản `confirm` | Không xác nhận cài; assignment vẫn chờ; banner còn | Đạt tự động backend và trình duyệt: Để sau giữ banner, không gọi endpoint cài. Chờ bản confirm thật. |
+| Mở trang Updates rồi thoát mà không xác nhận | Banner vẫn còn; không coi là đồng ý cài | Đạt tự động phần Xem bản cập nhật không cấp quyền cài và trạng thái chờ vẫn giữ. Chờ thao tác mở/thoát với bản confirm thật. |
+| Long-poll trả lại cùng bản nhiều lần | Không phát sinh toast trùng | Đạt tự động khử trùng khi nhận lại state và GUI đọc lại trạng thái. Chờ nhiều lượt long-poll thật cùng bản giao. |
+| Đã xác nhận hoặc đã cài | Không nhắc như bản chưa xác nhận; trạng thái tiến trình vẫn đúng | Đạt tự động phần nhận bằng chứng xác nhận và hết trạng thái chờ; tải gói không bị coi là xác nhận. Chưa nghiệm thu đầy đủ tiến trình xác nhận/cài thật. |
+| OTSD thu hồi hoặc thay bản đang chờ | Gỡ thông báo cũ, hiện đúng trạng thái/bản mới | Đạt tự động backend thu hồi/thay thế và GUI gỡ banner khi thu hồi. Chờ OTSD thu hồi/thay bản thật. |
+| Bản `auto` | Tuân thủ chính sách hiện có; đóng thông báo không đổi quyền hoặc lịch cài | Đạt tự động: không hiện banner chờ xác nhận, thông báo không gọi endpoint cài. Chưa nghiệm thu tác động với lịch/quy trình auto thật. |
+| OTSD mất kết nối hoặc trả lỗi | Báo kiểm tra thất bại, giữ và đánh dấu dữ liệu gần nhất; không báo "không có cập nhật" | Đạt tự động lỗi kết nối/chứng chỉ/xác thực và giữ dữ liệu cũ; GUI fixture đã kiểm lỗi chứng chỉ giữ banner. Chờ kiểm đầu-cuối với bản đang chờ và lỗi kết nối thật trong phạm vi được phép. |
+| GET chủ động và long-poll hoàn tất đồng thời | Không lùi state, không cài/report hai lần, không nhân đôi thông báo | Đạt tự động từng phần: GET chung Engine, bỏ phản hồi cũ và khử trùng toast. Chưa có bằng chứng ca tích hợp đầy đủ cài/report đồng thời; chờ kiểm phối hợp. |
+| OTSD chỉ đổi assignment firewall/Suricata | Không thông báo nhầm có cập nhật phần mềm mới | Đạt tự động ca đổi revision kèm firewall không tạo thông báo gói mới. Chờ ca Suricata riêng và giao assignment thật. |
+| Nhiều tab/phiên cùng mở | Không nhân đôi thông báo; một người xử lý thì các phiên khác cùng cập nhật | Đạt tự động claim đồng thời ở backend và hai tab trình duyệt giả lập dùng chung trạng thái. Chờ nhiều phiên đăng nhập thật. |
+| Đóng trình duyệt, bản mới đến, mở lại GUI | Thông báo (`unseen`) hiện khi mở lại | Đã kiểm tự động từng phần: lưu unseen và toast khi mở trang. Chưa có bằng chứng ca đầy đủ đóng trình duyệt → OTSD giao bản → mở lại; chờ kiểm thật. |
+| Dịch vụ khởi động lại khi đang có bản chờ | Trạng thái thông báo và mốc kiểm tra được giữ | Đạt tự động mở lại Store giữ mốc hẹn và banner sau Để sau. Chờ restart dịch vụ thật khi có bản đang chờ, trong phạm vi được phép. |
+| Phản hồi request cũ về sau khi request mới đã được nhận | Bị bỏ qua theo thứ tự request, không lùi state; không suy thứ tự từ chuỗi revision | Đạt tự động hai request chồng nhau với revision opaque, phản hồi cũ bị bỏ qua. Chưa có bằng chứng kiểm đầu-cuối độ trễ/phản hồi đảo thứ tự thật. |
 
 ## 10. Rủi ro và lưu ý
 
