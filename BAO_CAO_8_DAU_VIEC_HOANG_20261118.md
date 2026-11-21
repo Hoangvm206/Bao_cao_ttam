@@ -1,0 +1,162 @@
+# Báo cáo 8 đầu việc OTSA của Hoàng — 18/11/2026
+
+Hoàng đã triển khai phía OTSA trên thiết bị lab `.56` cho cả 4 việc của thầy và 4 việc anh Dương giao. Phần còn lại chủ yếu là kiểm phối hợp với máy chủ OTSD `.25` và nghiệm thu các thao tác nâng cấp, khôi phục thật.
+
+## Bốn việc của thầy
+
+**1. Xác minh luật firewall sau Apply và báo kết quả.** Khi người dùng sửa luật hoặc bật/tắt biểu tượng chuông để ghi log lưu lượng, GUI hiển thị *đã lưu, chờ Apply*. Sau Apply, OTSA đọc lại cấu hình qua API, đối chiếu với luật PF đang chạy và báo trường còn lệch. Nhật ký thao tác ghi người thực hiện và kết quả. Khi còn thay đổi local chờ Apply, OTSA hoãn áp bản giao từ OTSD. **Còn kiểm** qua GUI thật khi anh Dương giao một danh mục đúng lúc luật local đang chờ Apply.
+
+**2. Nhật ký Software Update.** Activity và log hệ thống ghi các mốc kiểm tra cập nhật, nhận bản giao, chọn để sau, bắt đầu cài, kết quả cài và xác minh sau khởi động. Đã đối chiếu được bản ghi của lần kiểm thủ công và lần kiểm theo lịch trên `.56`. **Còn kiểm** nhật ký xuyên suốt một lượt nhận bản, cài thành công và khởi động lại thật.
+
+**3. Giao diện Restore Points, khôi phục cấu hình và nhật ký Restore Activity.**
+
+- **Giao diện.** Bảng Restore Points hiển thị các bản XML thực tế. Khi tạo bản mới, bảng cập nhật ngay. Từng dòng có nút xem chi tiết, tải XML và kiểm tra để khôi phục. Người dùng cũng có thể nhập XML từ máy và xem kết quả kiểm ngay dưới thanh thao tác.
+- **Khôi phục.** OTSA kiểm tính toàn vẹn và phiên bản firmware trước khi cho xác nhận. Khi khôi phục, hệ thống sao lưu cấu hình đang chạy trước khi ghi. Đã kiểm giao diện trên Chrome với trang dựng từ bản triển khai `.56` và đã tạo, đọc lại một bản XML thật trên thiết bị.
+- **Nhật ký.** Bảng **Restore Activity** nằm ngay cuối trang, đọc tối đa 100 sự kiện gần nhất từ log hệ thống qua syslog-ng. Bảng hiển thị thời gian, tài khoản, thao tác và kết quả, có bộ lọc các lần bị chặn hoặc thất bại. Có thể truy lại việc tạo, tải, nhập, kiểm XML, sao lưu trước khi ghi và kết quả khôi phục.
+- **Còn kiểm** một lần khôi phục cấu hình thật trên `.56`, đối chiếu cấu hình sau khôi phục, đường phục hồi và bản ghi Restore Activity tương ứng. Các ca khôi phục thành công và thất bại hiện đã qua kiểm thử mô phỏng.
+
+**4. Tạo điểm khôi phục hệ thống và sao lưu cấu hình trước nâng cấp.** Luồng nâng cấp hệ thống của OTSA tự tạo và kiểm ZFS Boot Environment, lưu bản XML vào Restore Points rồi đọc lại trước khi cài. Giao dịch lưu cả tên điểm ZFS và ID bản XML để tìm đúng cặp khi cần phục hồi. Đã tạo XML thật trên `.56` và kiểm ca backup lỗi thì dừng trước khi cài, sau đó có thể thử lại. **Còn kiểm** trọn một lần nâng cấp và khởi động lại thật. Linh phụ trách nghiên cứu cách rollback khi nâng cấp gặp lỗi.
+
+## Bốn việc của anh Dương
+
+| Đầu việc | Kết quả phía OTSA | Còn kiểm phối hợp |
+|---|---|---|
+| 1. Định danh luật PF | SA nhận `rule_id`, ánh xạ với UUID luật trên OPNsense và ghi dấu `[OTSD:<rule_id>]` vào mô tả. Đã áp luật thử thật trên `.56`, đảo thứ tự vẫn giữ UUID và phát hiện được luật bị sửa tay. Quyết định Giữ hoặc Dùng bản OTSD áp dụng cho lần giao đang xử lý. | Anh Dương giao bộ thử từ `.25` để đối chiếu kết quả theo phiên bản, sau đó kiểm lại đầy đủ bộ `default 1.0.1`. Chờ xác nhận `.25` hỗ trợ `skipped` trước khi bật gửi trạng thái Giữ. |
+| 2. Telemetry trạng thái dịch vụ | Collector đọc `pluginctl -S`. Một lần chụp thật trên `.56` ghi đủ 16 dịch vụ. Ca dịch vụ dừng đã kiểm bằng dữ liệu mô phỏng. | Xác nhận OTSD hiển thị danh sách và đối chiếu trạng thái dừng của `hostwatch` trên `.35`. |
+| 3. Giám sát sự cố qua Monit | Đã bật Monit trên `.56`. Dữ liệu thực có kiểm tra hệ thống và ổ `RootFs`. Thử hạ ngưỡng dung lượng trong một phiên Monit cách ly đã ghi đúng cảnh báo. | Xác nhận OTSD hiển thị trạng thái và cảnh báo dung lượng. |
+| 4. Báo gói phần mềm đang cài | Đã kiểm SA gửi `installing` đúng version khi trình cài giả lập còn chạy và giữ đúng thứ tự với kết quả cuối `applied` hoặc `failed`. | Quyền gửi thật đang tắt theo thống nhất. Chờ anh Dương xác nhận `.25` hỗ trợ rồi bật gửi và kiểm một lượt cài thật. |
+
+
+## Chi tiết kỹ thuật luồng hoạt động Firewall / PF
+
+### 1. Kiến trúc tổng thể và hai nguồn tạo Rule
+
+Trong hệ thống OTSA, Packet Filter (pf) nhận luật từ 2 nguồn cùng dùng chung một ruleset:
+- **Nguồn Local (Quản trị viên thao tác trực tiếp trên GUI OPNsense - Đầu việc của Thầy)**: Admin thêm, sửa, xóa rule, bật/tắt luật hoặc bấm icon chuông để bật/tắt log lưu lượng.
+- **Nguồn Trung tâm OTSD (Máy chủ điều phối trung tâm - Đầu việc của anh Dương)**: Nhận các bộ luật từ OTSD gửi xuống theo từng danh mục (`category`), phiên bản (`version`), và định danh luật (`rule_id`).
+
+```text
+                    ┌──────────────────────────────────────────────┐
+                    │               Admin trên Web GUI             │
+                    │   (Thêm/Sửa/Xóa, Bật/Tắt, Chuông log)        │
+                    └──────────────────────┬───────────────────────┘
+                                           │ Lưu / Toggle
+                                           ▼
+                                ┌─────────────────────┐
+                                │ local-apply-pending │ ◄── Hoãn nạp OTSD nếu
+                                └──────────┬──────────┘     marker này tồn tại
+                                           │ Bấm Apply
+┌───────────────────────────┐              ▼
+│  OTSD Server (rules.json) │      ┌───────────────────────────────────┐
+│  - rule_id (UUIDv4)       │      │ FilterController::applyAction()   │
+│  - category, version      │      │  - Nạp PF qua rc.filter_configure │
+└─────────────┬─────────────┘      │  - rule_status.py đối chiếu 3 bên │
+              │ Sync               │  - Xóa marker nếu Verified        │
+              ▼                    └─────────────────┬─────────────────┘
+┌───────────────────────────┐                        │
+│   otsa-pf-loader.py       │                        │
+│   - Check xung đột / hoãn ├────────────────────────┤
+│   - Backup trước khi ghi  │                        │
+│   - Nạp & Readback PF     │                        ▼
+│   - Tự Rollback nếu lỗi   │             ┌─────────────────────┐
+└─────────────┬─────────────┘             │  PF Kernel (/sbin)  │
+              └──────────────────────────►│   (pfctl -sr)       │
+                                          └─────────────────────┘
+```
+
+### 2. Luồng Local: Thao tác Web GUI & Xác minh sau Apply (Việc của Thầy)
+
+Chi tiết triển khai tại:
+- `FilterController.php`
+- `otsa_status.volt`
+- `rule_status.py`
+
+#### Bước 1: Khi Admin thao tác (Save, Toggle, Đổi cờ Chuông log)
+- Các API như `toggleRuleAction`, `toggleRuleLogAction`, `setRuleAction`, `delRuleAction` đều chạy qua hàm bọc `auditRule(...)`.
+- Trước khi ghi thay đổi, hệ thống tạo một file marker: `/var/db/otsa-policy/pf/local-apply-pending`.
+- Tính mã băm SHA-256 của `/conf/config.xml`. Sau khi model lưu vào XML, nếu SHA-256 thay đổi, API trả về `application_state = 'saved_pending_apply'`.
+- Ghi log audit ra syslog daemon `otsa-firewall` với sự kiện (`rule_logging_changed`, `rule_enabled_changed`, user, uuid, result).
+- Giao diện: GUI hiển thị thông báo trạng thái *"Đã lưu, chờ Apply"*.
+
+#### Bước 2: Khi Admin bấm nút "Apply"
+- **Khóa chống tranh chấp (`withRuleApplyLock`)**: Sử dụng file lock độc quyền `/var/db/otsa-policy/pf/loader.lock` để đảm bảo luồng sync từ OTSD và luồng Apply từ Web không thể chạy đè lên nhau.
+- **Nạp luật vào PF**: Gọi `parent::applyAction()` để OPNsense sinh file rules `/tmp/rules.debug` và nạp vào kernel bằng `/usr/local/etc/rc.filter_configure`.
+- **Đọc lại và đối chiếu 3 chiều (Readback Verification qua `rule_status.py`)**:
+  - `rule_status.py` đọc song song:
+    - Model cấu hình: `/conf/config.xml`.
+    - Tập luật sinh ra: `/sbin/pfctl -nvf /tmp/rules.debug`.
+    - Tập luật đang chạy thực tế trong nhân OS: `/sbin/pfctl -sr`.
+  - **Cách đối chiếu**: Mỗi rule trên OPNsense khi sinh ra PF rule đều có nhãn `label "<uuid>"`. Kịch bản gom các dòng rule trong kernel theo uuid này và kiểm tra:
+    - `missing`: Luật bật trong XML (`enabled=1`) nhưng không tìm thấy nhãn trong PF kernel.
+    - `still_active`: Luật đã tắt (`enabled=0`) nhưng vẫn còn sót trong PF kernel.
+    - `logging_mismatch`: Luật trong XML bật chuông (`log=1`) nhưng dòng lệnh trong PF kernel thiếu cờ log, hoặc ngược lại.
+    - `compiled_rules_match`: Đối chiếu toàn bộ các dòng `pass`, `block`, `match` giữa `/tmp/rules.debug` và kernel.
+- **Kết luận**:
+  - Nếu khớp 100% (`status: ok`): File marker `local-apply-pending` được xóa (`unlink`), ghi syslog `event: apply_checked, result: verified`.
+  - Nếu không khớp hoặc Apply lỗi: Giữ nguyên marker `local-apply-pending`, báo trường còn lệch trên giao diện, ghi syslog `result: unverified`.
+- **Nút "Check PF" trên GUI**: Cho phép quản trị viên chủ động đọc lại trạng thái kiểm tra bất kỳ lúc nào mà không cần bấm Apply lại.
+
+### 3. Luồng OTSD: Định danh luật PF, Ghép UUID và Xử lý xung đột (Việc của anh Dương)
+
+Chi tiết triển khai tại:
+- `v2_rules.py`
+- `otsa_pf_conflicts.php`
+- `pf_conflict.py`
+- `otsa-pf-loader.py`
+- `otsa_pf_sync.php`
+
+#### 3.1. Nhận bản giao và Định danh luật (`rule_id`)
+- OTSD gửi gói `rules.json` kèm trường `rule_id` (chuẩn UUIDv4). Mô tả của rule được giới hạn tối đa 211 bytes UTF-8 để chừa dung lượng gắn tiền tố `[OTSD:<rule_id>] <description>`.
+- **Ánh xạ UUID (`slots.json`)**:
+  - OPNsense quản lý rule bằng UUID nội bộ. OTSA duy trì bảng ánh xạ giữa `rule_id` từ OTSD và UUID trên OPNsense trong `/var/db/otsa-policy/pf/slots.json`.
+  - **Giữ UUID khi đảo thứ tự**: Khi OTSD đổi sequence (đảo vị trí ưu tiên của rule), OTSA dùng `rule_id` để tìm đúng node XML hiện có và chỉ cập nhật trường sequence. UUID và kernel label không bị tạo mới, tránh làm gián đoạn trạng thái kết nối (state table) của PF.
+
+#### 3.2. Chặn đè khi Local đang chờ Apply
+Trong `otsa-pf-loader.py`:
+```python
+if local_apply_pending():
+    return {**review, 'status': 'local_conflict', 'code': 'local_firewall_changes_pending_apply'}
+```
+Nếu Admin local đang sửa luật mà chưa bấm Apply, OTSA từ chối nạp bản OTSD và trả về mã `local_firewall_changes_pending_apply`. Bản cập nhật của OTSD được hoãn cho đến khi Admin bấm Apply thành công và marker biến mất.
+
+#### 3.3. Cơ chế phát hiện sửa tay (Local Modification Detection)
+- OTSA lưu lại snapshot của lần commit trước trong `committed.json` và `model.json` (gọi là `baseline`).
+- Khi OTSD gửi bản mới, hàm `conflicts()` trong `otsa_pf_conflicts.php` so sánh 3 bên:
+  1. **Baseline** (bản OTSD nạp lần trước).
+  2. **Current** (cấu hình hiện tại trong XML OPNsense).
+  3. **Incoming** (bản OTSD mới gửi xuống).
+- Nếu phát hiện Admin local đã tự ý chỉnh sửa các trường (`action`, `interface`, `source`, `destination`, `log`, hoặc xóa luật):
+  - Hệ thống ghi nhận xung đột vào `/var/db/otsa-policy/pf/conflict.json` với chữ ký `fingerprint`.
+  - Trên Web GUI (`otsa_status.volt`), panel cảnh báo màu vàng tự động mở ra, liệt kê danh sách các trường bị lệch theo từng `category`.
+
+#### 3.4. Quyết định của Quản trị viên (Admin Decision)
+Quản trị viên có hai lựa chọn trên giao diện:
+- **Giữ luật hiện tại (`Keep local rules for this delivery`)**:
+  - Gửi API `resolve_conflict` với `decision = 'keep'`.
+  - Danh mục bị sửa tay sẽ được đóng băng (`frozen`), OTSD không ghi đè lên các rule này.
+  - OTSA gửi báo cáo về OTSD với trạng thái `skipped` và lý do `local_rule_kept: <rule_id, ...>`.
+- **Dùng bản OTSD (`Use OTSD rules for this delivery`)**:
+  - Gửi API `resolve_conflict` với `decision = 'overwrite'`.
+  - Ở vòng đồng bộ tiếp theo, OTSA sẽ nạp đè luật từ OTSD lên cấu hình local và cập nhật lại `baseline`.
+
+#### 3.5. Quy trình nạp an toàn và Rollback tự động
+Khi tiến hành nạp luật OTSD, `otsa-pf-loader.py` thực hiện chu trình giao dịch nghiêm ngặt:
+- **Sao lưu trước khi ghi**: Tạo bản backup `/conf/backup/config.xml.pre-otsd-<tx>`.
+- **Kích hoạt Watchdog**: Khởi động tiến trình watchdog độc lập với thời hạn an toàn 180 giây. Nếu hệ thống treo hoặc mất kết nối điều khiển, watchdog tự động phục hồi cấu hình cũ.
+- **Nạp luật & Kiểm tra Kernel**:
+  - Ghi model XML thông qua `otsa_pf_sync.php`.
+  - Nạp PF bằng `/usr/local/etc/rc.filter_configure skip_alias`.
+  - Chạy `verify_kernel()` kiểm tra lại luật bảo vệ (management IPv4/IPv6, SSH guard) xem có bị mất hoặc lệch không.
+- **Commit hoặc Rollback**:
+  - Nếu kiểm tra nhân thành công -> Cập nhật `phase = 'committed'`, cập nhật `committed.json`, gửi report `applied` về OTSD.
+  - Nếu có lỗi -> Ngay lập tức gọi hàm `rollback(tx)`, hoàn trả file XML từ bản backup và nạp lại PF ban đầu, bảo vệ thiết bị không bị cô lập (lock-out).
+
+### 4. Bảng tóm tắt các trạng thái và file nhật ký cần kiểm tra
+
+| Thao tác / Hiện tượng | File trạng thái / API | Nhật ký cần tra cứu |
+|---|---|---|
+| Admin đổi luật / bấm chuông | Marker `/var/db/otsa-policy/pf/local-apply-pending` được tạo | Syslog `otsa-firewall` (`rule_logging_changed`, `rule_enabled_changed`) |
+| Bấm Apply trên GUI | Gọi `/api/firewall/filter/apply` và verify qua `rule_status.py` | Syslog `otsa-firewall` (`apply_checked`, `result: verified / unverified`) |
+| OTSD giao khi Local chờ Apply | `otsa-pf-loader.py` hoãn với mã `local_firewall_changes_pending_apply` | File log `/var/log/otsa-pf-loader.jsonl` |
+| Luật bị sửa tay | `/var/db/otsa-policy/pf/conflict.json` (GUI hiện panel chọn Keep/Overwrite) | Syslog `otsa-firewall` (`local rule conflict <delivery_id>`) |
+| Giao dịch nạp OTSD | Thư mục `/var/db/otsa-policy/pf/<tx>/` (`model.json`, `transaction.json`) | File log `/var/log/otsa-pf-loader.jsonl` |
